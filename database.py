@@ -2,8 +2,8 @@
 # cd c:\python_developer
 # cd d:\python_developer
 # .\pydev\Scripts\activate
-# cd c:\python_developer\python_developer_lesson17
-# cd d:\python_developer\python_developer_lesson17
+# cd c:\python_developer\python_developer_lesson18
+# cd d:\python_developer\python_developer_lesson18
 #~~~~~~~~~~~~~~~~~~~~~~~~
 # python database.py
 #~~~~~~~~~~~~~~~~~~~~~~~~
@@ -12,8 +12,6 @@
 from sqlite3 import connect
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~ Создание баз данных в файле. Если таблицы уже созданы, то его исполнять не нужно
-
 cur = connect('base.db').cursor()
 
 cur.executescript('''

@@ -10,3 +10,14 @@ pytest
 mock
 coverage
 pytest-cov
+certifi
+charset-normalizer
+click
+dbf_light
+greenlet
+idna
+itsdangerous
+MarkupSafe
+SQLAlchemy==1.4.37
+urllib3
+Werkzeug
