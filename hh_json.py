@@ -1,21 +1,14 @@
 from pprint import pprint
 import re
 from collections import Counter
-from sqlite3 import connect
 
 from requests import get
 from pycbrf import ExchangeRates
 
+from db_orm import Session, Area
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def parce(vacancy, pages='3', where='all'):
-  """
-  Обработка данных по вакансиям, получение средней верхней и нижней границы зарплат
-   и процентного отношения для каждого навыка.
-  :param vacancy: текст поиска в вакансиях.
-  :param pages: количество анализируемых страниц.
-  :param where: место поиска текста.
-  :return: словарь с результатами анализа вакансий.
-  """
   url = 'https://api.hh.ru/vacancies'
   rate = ExchangeRates()
   p = {'text': vacancy if where == 'all' else f'NAME: {vacancy}' if where == 'name' else f'COMPANY_NAME: {vacancy}'}
@@ -38,18 +31,15 @@ def parce(vacancy, pages='3', where='all'):
     all_count = len(ress['items'])
     result['count'] += all_count
     for res in ress['items']:
-      # pprint(res)
+      pprint(res)
       skills = set()
       city_vac = res['area']['name']
-      con = connect('base.db')
-      cur = con.cursor()
-      # проверка наличия города в таблице
-      rest = cur.execute('select id from area where area.name = ?', (city_vac,)).fetchone()
+      db = Session()
+      rest = db.query(Area).filter_by(name=city_vac).one_or_none()
       if not rest:
-        # добавление строки в таблицу регионов.
-        cur.execute('insert into area values (null, ?, ?)', (city_vac, res['area']['id']))
-        con.commit()
-      con.close()
+        db.add(Area(name=city_vac, ind=res['area']['id']))
+        db.commit()
+      db.close()
       ar = res['area']
       res_full = get(res['url']).json()
       # pprint(res_full)
@@ -85,6 +75,8 @@ def parce(vacancy, pages='3', where='all'):
           'count': count,
           'percent': round((count / result['count'])*100, 2)})
   result['requirements'] = add
+  # with open('area.pkl', mode='wb') as f:
+  #   dump(area, f)
   return result
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
